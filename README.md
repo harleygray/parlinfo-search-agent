@@ -1,6 +1,6 @@
 # ParlInfo Search Agent
 
-A self-hosted data bridge for the Australian Parliament's public archive. It continuously scrapes [ParlInfo](https://parlinfo.aph.gov.au/) and the ParlView broadcast API, deduplicates and stores results in PostgreSQL, and exposes them via a typed JSON REST API — with a real-time LiveView dashboard for monitoring.
+An interface for accessing the Australian Parliament's public archives. It continuously scrapes [ParlInfo](https://parlinfo.aph.gov.au/) and the ParlView broadcast API, deduplicates and stores results in PostgreSQL, and exposes them via a typed JSON REST API — with a real-time LiveView dashboard for monitoring.
 
 ## What Problem Does This Solve?
 
