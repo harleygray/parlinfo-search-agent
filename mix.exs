@@ -4,7 +4,7 @@ defmodule ParlInfoSearchAgent.MixProject do
   def project do
     [
       app: :parlinfo_search_agent,
-      version: "0.1.0",
+      version: "0.1.1",
       elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -57,7 +57,8 @@ defmodule ParlInfoSearchAgent.MixProject do
       {:oban, "~> 2.19"},
       {:req, "~> 0.5"},
       {:mox, "~> 1.0", only: :test},
-      {:dotenvy, "~> 1.0"}
+      {:dotenvy, "~> 1.0"},
+      {:kino, "~> 0.19", only: :dev}
     ]
   end
 

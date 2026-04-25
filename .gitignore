@@ -41,3 +41,4 @@ playwright_server/node_modules/
 # Local secrets override (e.g. config/dev.secret.exs)
 config/*.secret.exs
 
+.claude/

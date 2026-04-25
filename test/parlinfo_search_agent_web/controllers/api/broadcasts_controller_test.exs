@@ -104,6 +104,49 @@ defmodule ParlInfoSearchAgentWeb.Api.BroadcastsControllerTest do
     end
   end
 
+  describe "API matches Ecto query" do
+    test "paginated results match Items.list_items", %{conn: conn} do
+      for i <- 1..5 do
+        insert_broadcast(%{
+          "parlview_id" => "consist-00#{i}",
+          "title" => "Consistency Broadcast #{i}"
+        })
+      end
+
+      params = %{"dataset" => "broadcasts", "page" => "1", "per_page" => "3"}
+      conn = get(conn, ~p"/api/broadcasts?page=1&per_page=3")
+      api_ids = json_response(conn, 200)["items"] |> Enum.map(& &1["id"]) |> Enum.sort()
+
+      %{items: ecto_items} = Items.list_items(params)
+      ecto_ids = ecto_items |> Enum.map(& &1.id) |> Enum.sort()
+
+      assert api_ids == ecto_ids
+    end
+
+    test "date-filtered results match Items.list_items", %{conn: conn} do
+      insert_broadcast(%{
+        "parlview_id" => "old-date-001",
+        "title" => "Old Broadcast",
+        "start_time" => "2023-06-01T09:00:00"
+      })
+
+      insert_broadcast(%{
+        "parlview_id" => "new-date-001",
+        "title" => "New Broadcast",
+        "start_time" => "2025-06-01T09:00:00"
+      })
+
+      params = %{"dataset" => "broadcasts", "from" => "2025-01-01"}
+      conn = get(conn, ~p"/api/broadcasts?from=2025-01-01")
+      api_ids = json_response(conn, 200)["items"] |> Enum.map(& &1["id"]) |> Enum.sort()
+
+      %{items: ecto_items} = Items.list_items(params)
+      ecto_ids = ecto_items |> Enum.map(& &1.id) |> Enum.sort()
+
+      assert api_ids == ecto_ids
+    end
+  end
+
   describe "GET /api/broadcasts/:id" do
     test "returns broadcast by UUID", %{conn: conn} do
       broadcast = insert_broadcast()

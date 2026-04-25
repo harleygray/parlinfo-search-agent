@@ -33,7 +33,7 @@ defmodule ParlInfoSearchAgent.Items do
             Report
             |> filter_from(from_date)
             |> filter_to(to_date)
-            |> order_by([i], desc: i.inserted_at)
+            |> order_by([i], [desc_nulls_last: i.date_tabled, desc: i.inserted_at])
 
           {Repo.all(q |> limit(^per_page) |> offset(^offset)), Repo.aggregate(q, :count, :id)}
 
@@ -42,7 +42,7 @@ defmodule ParlInfoSearchAgent.Items do
             Broadcast
             |> filter_broadcast_from(from_date)
             |> filter_broadcast_to(to_date)
-            |> order_by([i], desc: i.inserted_at)
+            |> order_by([i], [desc_nulls_last: i.start_time, desc: i.inserted_at])
 
           {Repo.all(q |> limit(^per_page) |> offset(^offset)), Repo.aggregate(q, :count, :id)}
 
@@ -51,7 +51,7 @@ defmodule ParlInfoSearchAgent.Items do
             HearingTranscript
             |> filter_from(from_date)
             |> filter_to(to_date)
-            |> order_by([i], desc: i.inserted_at)
+            |> order_by([i], [desc_nulls_last: i.date_tabled, desc: i.inserted_at])
 
           {Repo.all(q |> limit(^per_page) |> offset(^offset)), Repo.aggregate(q, :count, :id)}
 
@@ -240,8 +240,15 @@ defmodule ParlInfoSearchAgent.Items do
     transcripts = Repo.all(HearingTranscript |> filter_from(from_date) |> filter_to(to_date))
 
     (reports ++ broadcasts ++ transcripts)
-    |> Enum.sort_by(& &1.inserted_at, {:desc, DateTime})
+    |> Enum.sort_by(&item_sort_date/1, :desc)
   end
+
+  defp item_sort_date(%Report{date_tabled: nil}), do: ""
+  defp item_sort_date(%Report{date_tabled: d}), do: Date.to_iso8601(d)
+  defp item_sort_date(%HearingTranscript{date_tabled: nil}), do: ""
+  defp item_sort_date(%HearingTranscript{date_tabled: d}), do: Date.to_iso8601(d)
+  defp item_sort_date(%Broadcast{start_time: nil}), do: ""
+  defp item_sort_date(%Broadcast{start_time: dt}), do: dt |> DateTime.to_date() |> Date.to_iso8601()
 
   defp filter_from(query, nil), do: query
   defp filter_from(query, ""), do: query

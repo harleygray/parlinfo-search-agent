@@ -37,9 +37,10 @@ config :parlinfo_search_agent, Oban,
     {Oban.Plugins.Pruner, max_age: 60 * 60 * 24},
     {Oban.Plugins.Cron,
      crontab: [
-       {"*/5 * * * *", ParlInfoSearchAgent.Workers.ReportsScraper},
-       {"*/5 * * * *", ParlInfoSearchAgent.Workers.HearingTranscriptsScraper},
-       {"*/5 * * * *", ParlInfoSearchAgent.Workers.BroadcastsScraper}
+       {"0,30 * * * *", ParlInfoSearchAgent.Workers.ReportsScraper},
+       {"5,35 * * * *", ParlInfoSearchAgent.Workers.HearingTranscriptsScraper},
+       {"10,40 * * * *", ParlInfoSearchAgent.Workers.BroadcastsScraper},
+       {"15,45 * * * *", ParlInfoSearchAgent.Workers.DetailBackfillWorker}
      ]}
   ],
   queues: [scraper: 3]

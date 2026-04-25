@@ -43,6 +43,10 @@ defmodule ParlInfoSearchAgent.Workers.HearingTranscriptsScraper do
       Logger.info("[#{@dataset}] Done — #{new_count} new, #{existing_count} already existed")
       :ok
     else
+      {:error, :waf_blocked} ->
+        Logger.warning("[#{@dataset}] WAF block — snoozing job for 10 minutes")
+        {:snooze, 600}
+
       {:error, reason} ->
         Logger.error("[#{@dataset}] Scrape failed: #{inspect(reason)}")
         {:error, reason}

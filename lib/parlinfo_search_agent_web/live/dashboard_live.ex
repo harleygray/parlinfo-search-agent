@@ -1,12 +1,14 @@
 defmodule ParlInfoSearchAgentWeb.DashboardLive do
   use ParlInfoSearchAgentWeb, :live_view
 
+  require Logger
+
   import Ecto.Query
   alias ParlInfoSearchAgent.{Repo, Items}
   alias ParlInfoSearchAgent.Items.{Report, Broadcast, HearingTranscript}
 
   @refresh_interval 30_000
-  @initial_feed_limit 50
+  @per_page 50
 
   @workers [
     ParlInfoSearchAgent.Workers.ReportsScraper,
@@ -22,13 +24,23 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
       schedule_refresh()
     end
 
+    reports_data = Items.list_items(%{"dataset" => "reports", "page" => 1, "per_page" => @per_page})
+    transcripts_data = Items.list_items(%{"dataset" => "hearing_transcripts", "page" => 1, "per_page" => @per_page})
+    broadcasts_data = Items.list_items(%{"dataset" => "broadcasts", "page" => 1, "per_page" => @per_page})
+
     {:ok,
      socket
      |> assign(:tab, "feed")
      |> assign(:feed_filter, "reports")
-     |> assign(:reports_items, Items.get_latest(@initial_feed_limit, "reports"))
-     |> assign(:transcripts_items, Items.get_latest(@initial_feed_limit, "hearing_transcripts"))
-     |> assign(:broadcasts_items, Items.get_latest(@initial_feed_limit, "broadcasts"))
+     |> assign(:reports_items, reports_data.items)
+     |> assign(:reports_page, 1)
+     |> assign(:reports_total_pages, total_pages(reports_data.total, @per_page))
+     |> assign(:transcripts_items, transcripts_data.items)
+     |> assign(:transcripts_page, 1)
+     |> assign(:transcripts_total_pages, total_pages(transcripts_data.total, @per_page))
+     |> assign(:broadcasts_items, broadcasts_data.items)
+     |> assign(:broadcasts_page, 1)
+     |> assign(:broadcasts_total_pages, total_pages(broadcasts_data.total, @per_page))
      |> assign(:job_stats, fetch_job_stats())
      |> assign(:dataset_stats, fetch_dataset_stats())}
   end
@@ -45,16 +57,28 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
   def handle_info({:new_item, item}, socket) do
     case item_dataset(item) do
       "reports" ->
-        updated = Enum.take([item | socket.assigns.reports_items], @initial_feed_limit)
-        {:noreply, assign(socket, :reports_items, updated)}
+        if socket.assigns.reports_page == 1 do
+          updated = Enum.take([item | socket.assigns.reports_items], @per_page)
+          {:noreply, assign(socket, :reports_items, updated)}
+        else
+          {:noreply, socket}
+        end
 
       "hearing_transcripts" ->
-        updated = Enum.take([item | socket.assigns.transcripts_items], @initial_feed_limit)
-        {:noreply, assign(socket, :transcripts_items, updated)}
+        if socket.assigns.transcripts_page == 1 do
+          updated = Enum.take([item | socket.assigns.transcripts_items], @per_page)
+          {:noreply, assign(socket, :transcripts_items, updated)}
+        else
+          {:noreply, socket}
+        end
 
       "broadcasts" ->
-        updated = Enum.take([item | socket.assigns.broadcasts_items], @initial_feed_limit)
-        {:noreply, assign(socket, :broadcasts_items, updated)}
+        if socket.assigns.broadcasts_page == 1 do
+          updated = Enum.take([item | socket.assigns.broadcasts_items], @per_page)
+          {:noreply, assign(socket, :broadcasts_items, updated)}
+        else
+          {:noreply, socket}
+        end
 
       _ ->
         {:noreply, socket}
@@ -85,8 +109,18 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
   def handle_info(:refresh, socket) do
     schedule_refresh()
 
+    reports_data = Items.list_items(%{"dataset" => "reports", "page" => socket.assigns.reports_page, "per_page" => @per_page})
+    transcripts_data = Items.list_items(%{"dataset" => "hearing_transcripts", "page" => socket.assigns.transcripts_page, "per_page" => @per_page})
+    broadcasts_data = Items.list_items(%{"dataset" => "broadcasts", "page" => socket.assigns.broadcasts_page, "per_page" => @per_page})
+
     {:noreply,
      socket
+     |> assign(:reports_items, reports_data.items)
+     |> assign(:reports_total_pages, total_pages(reports_data.total, @per_page))
+     |> assign(:transcripts_items, transcripts_data.items)
+     |> assign(:transcripts_total_pages, total_pages(transcripts_data.total, @per_page))
+     |> assign(:broadcasts_items, broadcasts_data.items)
+     |> assign(:broadcasts_total_pages, total_pages(broadcasts_data.total, @per_page))
      |> assign(:job_stats, fetch_job_stats())
      |> assign(:dataset_stats, fetch_dataset_stats())}
   end
@@ -97,8 +131,16 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
   end
 
   @impl true
+  def handle_event("prev_page", %{"dataset" => dataset}, socket) do
+    {:noreply, change_page(socket, dataset, -1)}
+  end
+
+  def handle_event("next_page", %{"dataset" => dataset}, socket) do
+    {:noreply, change_page(socket, dataset, +1)}
+  end
+
+  @impl true
   def handle_event("run_worker", %{"worker" => short_name}, socket) do
-    require Logger
     Logger.info("[dashboard] run_worker clicked: #{short_name}")
 
     mod = Enum.find(@workers, fn m -> worker_short_name(m) == short_name end)
@@ -185,6 +227,12 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
             transcripts={@transcripts_items}
             broadcasts={@broadcasts_items}
             filter={@feed_filter}
+            reports_page={@reports_page}
+            reports_total_pages={@reports_total_pages}
+            transcripts_page={@transcripts_page}
+            transcripts_total_pages={@transcripts_total_pages}
+            broadcasts_page={@broadcasts_page}
+            broadcasts_total_pages={@broadcasts_total_pages}
           />
         <% end %>
         <%= if @tab == "status" do %>
@@ -200,6 +248,32 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
       </main>
       <.flash kind={:info} flash={@flash} />
       <.flash kind={:error} flash={@flash} />
+    </div>
+    """
+  end
+
+  attr :dataset, :string, required: true
+  attr :page, :integer, required: true
+  attr :total_pages, :integer, required: true
+  slot :inner_block, required: true
+
+  defp paginated_table(assigns) do
+    ~H"""
+    <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0;">
+      <div class="table-card" style="flex: 1; overflow-y: auto; min-height: 0;">
+        {render_slot(@inner_block)}
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; flex-shrink: 0; background: #f0f1f3; border-top: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent); border-radius: 0 0 var(--radius-box) var(--radius-box);">
+        <button phx-click="prev_page" phx-value-dataset={@dataset} disabled={@page == 1} class="page-btn">
+          ← Prev
+        </button>
+        <span style="font-size: 0.78rem; color: color-mix(in oklab, var(--color-base-content) 55%, transparent);">
+          Page {@page} of {@total_pages}
+        </span>
+        <button phx-click="next_page" phx-value-dataset={@dataset} disabled={@page >= @total_pages} class="page-btn">
+          Next →
+        </button>
+      </div>
     </div>
     """
   end
@@ -230,7 +304,7 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
             No reports yet. Scrape jobs will populate this feed.
           </p>
         <% else %>
-          <div class="table-card" style="flex: 1; overflow-y: auto;">
+          <.paginated_table dataset="reports" page={@reports_page} total_pages={@reports_total_pages}>
             <table class="table" style="width: 100%; table-layout: fixed;">
               <colgroup>
                 <col />
@@ -306,7 +380,7 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
                 <% end %>
               </tbody>
             </table>
-          </div>
+          </.paginated_table>
         <% end %>
       <% end %>
 
@@ -316,7 +390,7 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
             No hearing transcripts yet. Scrape jobs will populate this feed.
           </p>
         <% else %>
-          <div class="table-card" style="flex: 1; overflow-y: auto;">
+          <.paginated_table dataset="hearing_transcripts" page={@transcripts_page} total_pages={@transcripts_total_pages}>
             <table class="table" style="width: 100%; table-layout: fixed;">
               <colgroup>
                 <col />
@@ -392,7 +466,7 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
                 <% end %>
               </tbody>
             </table>
-          </div>
+          </.paginated_table>
         <% end %>
       <% end %>
 
@@ -402,7 +476,7 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
             No broadcasts yet. Scrape jobs will populate this feed.
           </p>
         <% else %>
-          <div class="table-card" style="flex: 1; overflow-y: auto;">
+          <.paginated_table dataset="broadcasts" page={@broadcasts_page} total_pages={@broadcasts_total_pages}>
             <table class="table" style="width: 100%; table-layout: fixed;">
               <colgroup>
                 <col style="width: 22rem;" />
@@ -457,7 +531,7 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
                 <% end %>
               </tbody>
             </table>
-          </div>
+          </.paginated_table>
         <% end %>
       <% end %>
     </div>
@@ -657,7 +731,7 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
        [
          %{
            path: "/api/reports",
-           description: "Paginated list of committee reports. Filter by date range.",
+           description: "Paginated list of committee reports, ordered by date tabled (most recent first). Filter by date range.",
            params: [
              %{
                name: "from",
@@ -753,7 +827,7 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
        [
          %{
            path: "/api/hearing_transcripts",
-           description: "Paginated list of committee hearing transcripts. Filter by date range.",
+           description: "Paginated list of committee hearing transcripts, ordered by date tabled (most recent first). Filter by date range.",
            params: [
              %{
                name: "from",
@@ -884,7 +958,7 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
          },
          %{
            path: "/api/broadcasts/latest",
-           description: "Most recently inserted broadcast records.",
+           description: "Most recent broadcast records by start time.",
            params: [
              %{
                name: "limit",
@@ -1070,4 +1144,34 @@ defmodule ParlInfoSearchAgentWeb.DashboardLive do
   defp schedule_refresh do
     Process.send_after(self(), :refresh, @refresh_interval)
   end
+
+  defp total_pages(0, _), do: 1
+  defp total_pages(total, per_page), do: max(1, div(total + per_page - 1, per_page))
+
+  defp change_page(socket, dataset, delta) do
+    {items_key, page_key, total_key, dataset_param} = dataset_keys(dataset)
+    current_page = Map.get(socket.assigns, page_key)
+    total = Map.get(socket.assigns, total_key)
+    new_page = max(1, min(total, current_page + delta))
+
+    if new_page == current_page do
+      socket
+    else
+      data = Items.list_items(%{"dataset" => dataset_param, "page" => new_page, "per_page" => @per_page})
+
+      socket
+      |> assign(items_key, data.items)
+      |> assign(page_key, new_page)
+      |> assign(total_key, total_pages(data.total, @per_page))
+    end
+  end
+
+  defp dataset_keys("reports"),
+    do: {:reports_items, :reports_page, :reports_total_pages, "reports"}
+
+  defp dataset_keys("hearing_transcripts"),
+    do: {:transcripts_items, :transcripts_page, :transcripts_total_pages, "hearing_transcripts"}
+
+  defp dataset_keys("broadcasts"),
+    do: {:broadcasts_items, :broadcasts_page, :broadcasts_total_pages, "broadcasts"}
 end

@@ -87,6 +87,13 @@ app.post("/scrape", async (req, res) => {
     const finalUrl = page.url();
     console.log("scrape:navigated title=" + JSON.stringify(pageTitle) + " final_url=" + finalUrl);
 
+    if (pageTitle.includes("WAF Block") || pageTitle.includes("Web Application Firewall")) {
+      console.warn("scrape:waf_blocked url=" + url);
+      await context.close().catch(() => {});
+      context = null;
+      return res.status(403).json({ error: "waf_blocked", url });
+    }
+
     console.log("scrape:selector_wait");
     await page.waitForSelector("li.result, .result-row, .search-result, table.searchresults tr, div[class*='result']", {
       timeout: 15000,
@@ -97,30 +104,28 @@ app.post("/scrape", async (req, res) => {
       console.log("scrape:selector_missing");
     });
 
-    const { items, rowErrors, diag } = await page.evaluate(() => {
+    const { items, rowErrors, diag } = await page.evaluate((diagEnabled) => {
       const results = [];
       const errors = [];
 
       // ParlInfo search results: <ul id="results"><li class="result hiliteRow|loliteRow">
       const rows = document.querySelectorAll("li.result");
 
-      // Diagnostic: all links on the page, grouped by href pattern, to reveal the real URL shape
-      const allLinks = Array.from(document.querySelectorAll("a[href]")).map((a) => ({
-        href: a.href,
-        text: (a.textContent || "").trim().slice(0, 100),
-        parentTag: a.parentElement
-          ? a.parentElement.tagName +
-            (a.parentElement.className
-              ? "." + String(a.parentElement.className).trim().split(/\s+/).join(".")
-              : "")
-          : null,
-      }));
+      const allLinks = diagEnabled
+        ? Array.from(document.querySelectorAll("a[href]")).map((a) => ({
+            href: a.href,
+            text: (a.textContent || "").trim().slice(0, 100),
+            parentTag: a.parentElement
+              ? a.parentElement.tagName +
+                (a.parentElement.className
+                  ? "." + String(a.parentElement.className).trim().split(/\s+/).join(".")
+                  : "")
+              : null,
+          }))
+        : [];
 
-      // Diagnostic: inner HTML of the results container (capped to avoid huge files)
-      const container = document.querySelector(".resultsMainCol");
+      const container = diagEnabled ? document.querySelector(".resultsMainCol") : null;
       const containerHtml = container ? container.innerHTML.slice(0, 20000) : null;
-
-      // Diagnostic: first-level children of the results container
       const containerChildren = container
         ? Array.from(container.children).slice(0, 20).map((el) => ({
             tag: el.tagName,
@@ -168,10 +173,10 @@ app.post("/scrape", async (req, res) => {
         rowErrors: errors,
         diag: { rowCount: rows.length, allLinks, containerHtml, containerChildren },
       };
-    });
+    }, DIAGNOSTICS_ENABLED);
 
     rowErrors.forEach((msg) => console.error("scrape:row_error " + msg));
-    console.log("scrape:diag rows_matched=" + diag.rowCount + " all_links_found=" + diag.allLinks.length);
+    console.log("scrape:diag rows_matched=" + diag.rowCount);
 
     if (DIAGNOSTICS_ENABLED && diag.rowCount === 0) {
       // Write full diagnostic snapshot so we can determine the real selectors.
@@ -237,6 +242,13 @@ app.post("/scrape_item", async (req, res) => {
     const pageTitle = await page.title();
     const finalUrl = page.url();
     console.log("scrape_item:navigated title=" + JSON.stringify(pageTitle));
+
+    if (pageTitle.includes("WAF Block") || pageTitle.includes("Web Application Firewall")) {
+      console.warn("scrape_item:waf_blocked url=" + url);
+      await context.close().catch(() => {});
+      context = null;
+      return res.status(403).json({ error: "waf_blocked", url });
+    }
 
     const { fields, allLinks, pageHtml, parlinfo_id } = await page.evaluate(() => {
       // PDF links — "Download PDF" link is most reliable

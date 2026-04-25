@@ -1,0 +1,114 @@
+# ParlInfo Backfill Analysis
+
+```elixir
+alias ParlInfoSearchAgent.Repo
+alias ParlInfoSearchAgent.Items.{Report, Broadcast, HearingTranscript}
+import Ecto.Query
+```
+
+## Dataset Overview
+
+Record counts and date coverage per dataset.
+
+```elixir
+datasets = [
+  {"Reports", Report, :date_tabled},
+  {"Hearing Transcripts", HearingTranscript, :date_tabled},
+  {"Broadcasts", Broadcast, :start_time}
+]
+
+for {label, schema, date_field} <- datasets do
+  {count, min_date, max_date} =
+    Repo.one(
+      from r in schema,
+        select: {count(r.id), min(field(r, ^date_field)), max(field(r, ^date_field))}
+    )
+
+  IO.puts("#{label}: #{count} records | #{min_date} → #{max_date}")
+end
+```
+
+## Year-by-Year Distribution — Reports
+
+```elixir
+from(r in Report,
+  where: not is_nil(r.date_tabled),
+  group_by: fragment("date_part('year', ?)", r.date_tabled),
+  select: {fragment("date_part('year', ?)", r.date_tabled), count(r.id)},
+  order_by: fragment("1")
+)
+|> Repo.all()
+|> Enum.map(fn {year, count} -> %{year: trunc(year), count: count} end)
+|> Kino.DataTable.new()
+```
+
+## Year-by-Year Distribution — Hearing Transcripts
+
+```elixir
+from(r in HearingTranscript,
+  where: not is_nil(r.date_tabled),
+  group_by: fragment("date_part('year', ?)", r.date_tabled),
+  select: {fragment("date_part('year', ?)", r.date_tabled), count(r.id)},
+  order_by: fragment("1")
+)
+|> Repo.all()
+|> Enum.map(fn {year, count} -> %{year: trunc(year), count: count} end)
+|> Kino.DataTable.new()
+```
+
+## Data Quality — Records Missing PDF URLs
+
+Items that were backfilled without detail scraping.
+
+```elixir
+missing =
+  from(r in Report,
+    where: is_nil(r.pdf_url),
+    select: %{title: r.title, date_tabled: r.date_tabled, parlinfo_id: r.parlinfo_id},
+    order_by: [desc: r.date_tabled],
+    limit: 200
+  )
+  |> Repo.all()
+
+IO.puts("Reports missing PDF URL: #{length(missing)}")
+Kino.DataTable.new(missing)
+```
+
+```elixir
+missing_transcripts =
+  from(r in HearingTranscript,
+    where: is_nil(r.pdf_url),
+    select: %{title: r.title, date_tabled: r.date_tabled, parlinfo_id: r.parlinfo_id},
+    order_by: [desc: r.date_tabled],
+    limit: 200
+  )
+  |> Repo.all()
+
+IO.puts("Transcripts missing PDF URL: #{length(missing_transcripts)}")
+Kino.DataTable.new(missing_transcripts)
+```
+
+## Recent Records
+
+```elixir
+from(r in Report,
+  order_by: [desc: r.inserted_at],
+  limit: 20,
+  select: %{title: r.title, date_tabled: r.date_tabled, committee_name: r.committee_name}
+)
+|> Repo.all()
+|> Kino.DataTable.new()
+```
+
+## Ad-hoc Exploration
+
+```elixir
+# Edit this cell freely — the full app context is available
+from(r in Report,
+  where: ilike(r.committee_name, "%Economics%"),
+  order_by: [desc: r.date_tabled],
+  limit: 20
+)
+|> Repo.all()
+|> Kino.DataTable.new()
+```

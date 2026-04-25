@@ -6,14 +6,15 @@ defmodule ParlInfoSearchAgent.Scraper.ParlinfoClient do
   @base_url "http://localhost:4003"
 
   def scrape(url) do
-    Logger.info("[parlinfo_client] POST /scrape — scraping: #{url}")
-
     case Req.post("#{@base_url}/scrape", json: %{url: url}, receive_timeout: 60_000) do
       {:ok, %{status: 200, body: body}} ->
         items = Map.get(body, "items", [])
-        Logger.info("[parlinfo_client] 200 OK — #{length(items)} items returned")
         Logger.debug("[parlinfo_client] raw body: #{inspect(body)}")
         {:ok, items}
+
+      {:ok, %{status: 403, body: %{"error" => "waf_blocked"}}} ->
+        Logger.warning("[parlinfo_client] WAF block detected on #{url}")
+        {:error, :waf_blocked}
 
       {:ok, %{status: status, body: body}} ->
         Logger.error("[parlinfo_client] #{status} error — body: #{inspect(body)}")
@@ -26,16 +27,18 @@ defmodule ParlInfoSearchAgent.Scraper.ParlinfoClient do
   end
 
   def scrape_item(url, dataset) do
-    Logger.info("[parlinfo_client] POST /scrape_item dataset=#{dataset} — #{url}")
-
     case Req.post("#{@base_url}/scrape_item",
            json: %{url: url, dataset: dataset},
            receive_timeout: 60_000
          ) do
       {:ok, %{status: 200, body: body}} ->
         fields = Map.get(body, "fields", %{})
-        Logger.info("[parlinfo_client] scrape_item 200 OK — fields: #{inspect(Map.keys(fields))}")
+        Logger.debug("[parlinfo_client] scrape_item fields: #{inspect(Map.keys(fields))}")
         {:ok, fields}
+
+      {:ok, %{status: 403, body: %{"error" => "waf_blocked"}}} ->
+        Logger.warning("[parlinfo_client] WAF block on scrape_item #{url}")
+        {:error, :waf_blocked}
 
       {:ok, %{status: status, body: body}} ->
         Logger.error("[parlinfo_client] scrape_item #{status} error — body: #{inspect(body)}")

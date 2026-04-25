@@ -109,6 +109,45 @@ defmodule ParlInfoSearchAgentWeb.Api.ReportsControllerTest do
     end
   end
 
+  describe "API matches Ecto query" do
+    test "paginated results match Items.list_items", %{conn: conn} do
+      for i <- 1..5 do
+        insert_report(%{
+          "parlinfo_id" => "committees/reportsen/consist#{i}/0000",
+          "title" => "Consistency Report #{i}",
+          "date_tabled" => "202#{i}-06-01"
+        })
+      end
+
+      params = %{"dataset" => "reports", "page" => "1", "per_page" => "3"}
+      conn = get(conn, ~p"/api/reports?page=1&per_page=3")
+      api_ids = json_response(conn, 200)["items"] |> Enum.map(& &1["id"]) |> Enum.sort()
+
+      %{items: ecto_items} = Items.list_items(params)
+      ecto_ids = ecto_items |> Enum.map(& &1.id) |> Enum.sort()
+
+      assert api_ids == ecto_ids
+    end
+
+    test "date-filtered results match Items.list_items", %{conn: conn} do
+      for {date, suffix} <- [{"2023-06-01", "old001"}, {"2025-06-01", "new001"}] do
+        insert_report(%{
+          "parlinfo_id" => "committees/reportsen/#{suffix}/0000",
+          "date_tabled" => date
+        })
+      end
+
+      params = %{"dataset" => "reports", "from" => "2025-01-01"}
+      conn = get(conn, ~p"/api/reports?from=2025-01-01")
+      api_ids = json_response(conn, 200)["items"] |> Enum.map(& &1["id"]) |> Enum.sort()
+
+      %{items: ecto_items} = Items.list_items(params)
+      ecto_ids = ecto_items |> Enum.map(& &1.id) |> Enum.sort()
+
+      assert api_ids == ecto_ids
+    end
+  end
+
   describe "GET /api/reports/:id" do
     test "returns report by UUID", %{conn: conn} do
       report = insert_report()

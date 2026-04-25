@@ -2,7 +2,8 @@ defmodule ParlInfoSearchAgent.Scraper.PlaywrightServer do
   use GenServer
   require Logger
 
-  @health_url "http://localhost:4003/health"
+  @port 4003
+  @health_url "http://localhost:#{@port}/health"
   @startup_timeout 30_000
 
   def start_link(opts \\ []) do
@@ -19,9 +20,15 @@ defmodule ParlInfoSearchAgent.Scraper.PlaywrightServer do
   @impl true
   def init(_opts) do
     Process.flag(:trap_exit, true)
-    port = open_port()
-    wait_for_ready()
-    {:ok, %{port: port}}
+
+    if port_in_use?() do
+      Logger.info("playwright_server already running on port #{@port}, reusing it")
+      {:ok, %{port: nil}}
+    else
+      port = open_port()
+      wait_for_ready()
+      {:ok, %{port: port}}
+    end
   end
 
   @impl true
@@ -43,6 +50,8 @@ defmodule ParlInfoSearchAgent.Scraper.PlaywrightServer do
   def handle_info(_msg, state), do: {:noreply, state}
 
   @impl true
+  def terminate(_reason, %{port: nil}), do: :ok
+
   def terminate(_reason, %{port: port}) do
     case Port.info(port, :os_pid) do
       {:os_pid, os_pid} -> System.cmd("kill", ["-TERM", "#{os_pid}"])
@@ -59,6 +68,17 @@ defmodule ParlInfoSearchAgent.Scraper.PlaywrightServer do
       {:spawn_executable, node},
       [:binary, :exit_status, {:cd, File.cwd!()}, {:args, ["playwright_server/server.js"]}]
     )
+  end
+
+  defp port_in_use? do
+    case :gen_tcp.connect(~c"localhost", @port, [], 1_000) do
+      {:ok, socket} ->
+        :gen_tcp.close(socket)
+        true
+
+      {:error, _} ->
+        false
+    end
   end
 
   defp wait_for_ready(elapsed \\ 0) do
