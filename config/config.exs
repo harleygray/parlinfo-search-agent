@@ -43,7 +43,7 @@ config :parlinfo_search_agent, Oban,
        {"15,45 * * * *", ParlInfoSearchAgent.Workers.DetailBackfillWorker}
      ]}
   ],
-  queues: [scraper: 3]
+  queues: [scraper: 1]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

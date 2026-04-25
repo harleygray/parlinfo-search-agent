@@ -178,6 +178,14 @@ app.post("/scrape", async (req, res) => {
     rowErrors.forEach((msg) => console.error("scrape:row_error " + msg));
     console.log("scrape:diag rows_matched=" + diag.rowCount);
 
+    // A 0-result page with an Azure WAF title is a soft block, not genuine end-of-pagination.
+    if (diag.rowCount === 0 && pageTitle.includes("Azure WAF")) {
+      console.warn("scrape:waf_blocked (soft, 0 results) url=" + url);
+      await context.close().catch(() => {});
+      context = null;
+      return res.status(403).json({ error: "waf_blocked", url });
+    }
+
     if (DIAGNOSTICS_ENABLED && diag.rowCount === 0) {
       // Write full diagnostic snapshot so we can determine the real selectors.
       const slug = url.replace(/[^a-zA-Z0-9]/g, "_").slice(0, 80);
