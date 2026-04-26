@@ -171,14 +171,14 @@ defmodule ParliamentSearchAgentWeb.DashboardLive do
         class="flex items-center px-6"
         style="background-color: var(--color-primary); border-bottom: 2px solid var(--color-primary-dark); min-height: 3rem;"
       >
-        <span class="text-lg font-semibold" style="color: white;">ParlInfo Search Agent</span>
+        <span class="text-lg font-semibold" style="color: white;">Parliament Search Agent</span>
         <details style="position: relative; display: flex; align-items: center; margin-left: 0.5rem;">
           <summary style="list-style: none; cursor: pointer; color: rgba(255,255,255,0.7); font-size: 0.7rem; display: inline-flex; align-items: center; justify-content: center; width: 1.1rem; height: 1.1rem; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%;">
             ?
           </summary>
           <div style="position: absolute; top: calc(100% + 0.5rem); left: 0; width: 26rem; background: white; border-radius: 0.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 50; padding: 1rem; color: #111827; font-size: 0.875rem; line-height: 1.6;">
             <p style="font-weight: 600; margin-bottom: 0.4rem; color: var(--color-primary);">
-              ParlInfo Search Agent
+              Parliament Search Agent
             </p>
             <p>
               The goal of this project is to act as a <strong>data bridge</strong>

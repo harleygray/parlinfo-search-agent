@@ -17,7 +17,7 @@ defmodule Mix.Tasks.Parlinfo.Livebook do
 
     IO.puts("""
     ─────────────────────────────────────────────────────
-    Livebook setup for ParlInfo Search Agent
+    Livebook setup for Parliament Search Agent
     ─────────────────────────────────────────────────────
 
     TERMINAL 1 — start the app as a named node:

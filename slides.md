@@ -1,4 +1,4 @@
-# ParlInfo Search Agent — Launch Video
+# Parliament Search Agent — Launch Video
 
 **Target length:** ~3 minutes total. ~60s overview + ~2 min technical.
 **Format:** PiP — webcam of you over the PC screen. Slides act as B-roll / reference behind you when you're not on the live app.
@@ -18,7 +18,7 @@ The job here is: land the problem, prove it works, close with a call to action. 
 **On screen:** Slide behind you.
 
 ```
-ParlInfo Search Agent
+Parliament Search Agent
 A clean API for Australian parliamentary data
 ```
 
@@ -169,7 +169,7 @@ Then maybe re-open the dashboard and show a "Run now" button or the live feed up
 **On screen:** Slide behind you.
 
 ```
-ParlInfo Search Agent
+Parliament Search Agent
 
 Live:    <your-domain>
 Code:    github.com/harleygray/parliament-search-agent

@@ -1,4 +1,4 @@
-# ParlInfo Search Agent
+# Parliament Search Agent
 
 An interface for accessing the Australian Parliament's public archives. It continuously scrapes [ParlInfo](https://parlinfo.aph.gov.au/) and the ParlView broadcast API, deduplicates and stores results in PostgreSQL, and exposes them via a typed JSON REST API — with a real-time LiveView dashboard for monitoring.
 

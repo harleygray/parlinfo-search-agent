@@ -3,6 +3,6 @@ defmodule ParliamentSearchAgentWeb.PageControllerTest do
 
   test "GET / redirects to LiveView dashboard", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "ParlInfo Search Agent"
+    assert html_response(conn, 200) =~ "Parliament Search Agent"
   end
 end
