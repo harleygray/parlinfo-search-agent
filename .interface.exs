@@ -1,6 +1,6 @@
 [
-  project: "parlinfo-search-agent",
-  cwd: "/home/harley/Projects/parlinfo-search-agent",
+  project: "parliament-search-agent",
+  cwd: "/home/harley/Projects/parliament-search-agent",
   tasks: [
     %{
       id: :phoenix_server,

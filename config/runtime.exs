@@ -4,12 +4,12 @@ import Dotenvy
 source!([".env", ".env.#{config_env()}", System.get_env()])
 
 if config_env() != :prod do
-  config :parlinfo_search_agent, ParlInfoSearchAgent.Repo,
+  config :parliament_search_agent, ParliamentSearchAgent.Repo,
     url:
       env!(
         "DATABASE_URL",
         :string,
-        "ecto://postgres:postgres@localhost/parlinfo_search_agent_#{config_env()}"
+        "ecto://postgres:postgres@localhost/parliament_search_agent_#{config_env()}"
       )
 end
 
@@ -25,12 +25,12 @@ end
 # If you use `mix release`, you need to explicitly enable the server
 # by passing the PHX_SERVER=true when you start it:
 #
-#     PHX_SERVER=true bin/parlinfo_search_agent start
+#     PHX_SERVER=true bin/parliament_search_agent start
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
-  config :parlinfo_search_agent, ParlInfoSearchAgentWeb.Endpoint, server: true
+  config :parliament_search_agent, ParliamentSearchAgentWeb.Endpoint, server: true
 end
 
 if config_env() == :prod do
@@ -43,7 +43,7 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
-  config :parlinfo_search_agent, ParlInfoSearchAgent.Repo,
+  config :parliament_search_agent, ParliamentSearchAgent.Repo,
     # ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
@@ -63,11 +63,11 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "parlinfo-search-agent.fly.dev"
+  host = System.get_env("PHX_HOST") || "parliament-search-agent.fly.dev"
 
-  config :parlinfo_search_agent, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+  config :parliament_search_agent, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
-  config :parlinfo_search_agent, ParlInfoSearchAgentWeb.Endpoint,
+  config :parliament_search_agent, ParliamentSearchAgentWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
       # Enable IPv6 and bind on all interfaces.
@@ -84,7 +84,7 @@ if config_env() == :prod do
   # To get SSL working, you will need to add the `https` key
   # to your endpoint configuration:
   #
-  #     config :parlinfo_search_agent, ParlInfoSearchAgentWeb.Endpoint,
+  #     config :parliament_search_agent, ParliamentSearchAgentWeb.Endpoint,
   #       https: [
   #         ...,
   #         port: 443,
@@ -106,7 +106,7 @@ if config_env() == :prod do
   # We also recommend setting `force_ssl` in your config/prod.exs,
   # ensuring no data is ever sent via http, always redirecting to https:
   #
-  #     config :parlinfo_search_agent, ParlInfoSearchAgentWeb.Endpoint,
+  #     config :parliament_search_agent, ParliamentSearchAgentWeb.Endpoint,
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.

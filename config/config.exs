@@ -7,20 +7,20 @@
 # General application configuration
 import Config
 
-config :parlinfo_search_agent,
-  namespace: ParlInfoSearchAgent,
-  ecto_repos: [ParlInfoSearchAgent.Repo],
+config :parliament_search_agent,
+  namespace: ParliamentSearchAgent,
+  ecto_repos: [ParliamentSearchAgent.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configure the endpoint
-config :parlinfo_search_agent, ParlInfoSearchAgentWeb.Endpoint,
+config :parliament_search_agent, ParliamentSearchAgentWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: ParlInfoSearchAgentWeb.ErrorHTML, json: ParlInfoSearchAgentWeb.ErrorJSON],
+    formats: [html: ParliamentSearchAgentWeb.ErrorHTML, json: ParliamentSearchAgentWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: ParlInfoSearchAgent.PubSub,
+  pubsub_server: ParliamentSearchAgent.PubSub,
   live_view: [signing_salt: "efFnHyIO"]
 
 # Configure Elixir's Logger
@@ -31,16 +31,16 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :parlinfo_search_agent, Oban,
-  repo: ParlInfoSearchAgent.Repo,
+config :parliament_search_agent, Oban,
+  repo: ParliamentSearchAgent.Repo,
   plugins: [
     {Oban.Plugins.Pruner, max_age: 60 * 60 * 24},
     {Oban.Plugins.Cron,
      crontab: [
-       {"0,30 * * * *", ParlInfoSearchAgent.Workers.ReportsScraper},
-       {"5,35 * * * *", ParlInfoSearchAgent.Workers.HearingTranscriptsScraper},
-       {"10,40 * * * *", ParlInfoSearchAgent.Workers.BroadcastsScraper},
-       {"15,45 * * * *", ParlInfoSearchAgent.Workers.DetailBackfillWorker}
+       {"0,30 * * * *", ParliamentSearchAgent.Workers.ReportsScraper},
+       {"5,35 * * * *", ParliamentSearchAgent.Workers.HearingTranscriptsScraper},
+       {"10,40 * * * *", ParliamentSearchAgent.Workers.BroadcastsScraper},
+       {"15,45 * * * *", ParliamentSearchAgent.Workers.DetailBackfillWorker}
      ]}
   ],
   queues: [scraper: 1]

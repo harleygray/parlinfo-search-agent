@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.AddParlviewPermalinkToReports do
+defmodule ParliamentSearchAgent.Repo.Migrations.AddParlviewPermalinkToReports do
   use Ecto.Migration
 
   def change do

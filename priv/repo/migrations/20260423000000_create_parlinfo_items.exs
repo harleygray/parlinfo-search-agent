@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.CreateParlinfoItems do
+defmodule ParliamentSearchAgent.Repo.Migrations.CreateParlinfoItems do
   use Ecto.Migration
 
   def change do

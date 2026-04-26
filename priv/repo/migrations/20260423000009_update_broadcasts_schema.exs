@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.UpdateBroadcastsSchema do
+defmodule ParliamentSearchAgent.Repo.Migrations.UpdateBroadcastsSchema do
   use Ecto.Migration
 
   def change do

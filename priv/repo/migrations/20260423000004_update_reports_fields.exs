@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.UpdateReportsFields do
+defmodule ParliamentSearchAgent.Repo.Migrations.UpdateReportsFields do
   use Ecto.Migration
 
   def up do

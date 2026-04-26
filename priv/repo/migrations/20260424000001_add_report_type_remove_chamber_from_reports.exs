@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.AddReportTypeRemoveChamberFromReports do
+defmodule ParliamentSearchAgent.Repo.Migrations.AddReportTypeRemoveChamberFromReports do
   use Ecto.Migration
 
   def change do

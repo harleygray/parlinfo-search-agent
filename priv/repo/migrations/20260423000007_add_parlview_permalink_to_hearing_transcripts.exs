@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.AddParlviewPermalinkToHearingTranscripts do
+defmodule ParliamentSearchAgent.Repo.Migrations.AddParlviewPermalinkToHearingTranscripts do
   use Ecto.Migration
 
   def change do

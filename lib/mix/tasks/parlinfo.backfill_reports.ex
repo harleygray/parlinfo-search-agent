@@ -5,8 +5,8 @@ defmodule Mix.Tasks.Parlinfo.BackfillReports do
 
   @max_waf_retries 5
 
-  alias ParlInfoSearchAgent.Items
-  alias ParlInfoSearchAgent.Scraper.ParlinfoClient
+  alias ParliamentSearchAgent.Items
+  alias ParliamentSearchAgent.Scraper.ParlinfoClient
 
   @impl Mix.Task
   def run(_args) do

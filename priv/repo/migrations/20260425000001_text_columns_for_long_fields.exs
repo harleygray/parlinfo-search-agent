@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.TextColumnsForLongFields do
+defmodule ParliamentSearchAgent.Repo.Migrations.TextColumnsForLongFields do
   use Ecto.Migration
 
   # varchar(255) is too short for some ParlInfo titles and URLs.

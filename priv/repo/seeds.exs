@@ -5,7 +5,7 @@
 # Inside the script, you can read and write to any of your
 # repositories directly:
 #
-#     ParlInfoSearchAgent.Repo.insert!(%ParlInfoSearchAgent.SomeSchema{})
+#     ParliamentSearchAgent.Repo.insert!(%ParliamentSearchAgent.SomeSchema{})
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.

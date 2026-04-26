@@ -1,7 +1,7 @@
-Mox.defmock(ParlInfoSearchAgent.Scraper.MockParlinfoClient,
-  for: ParlInfoSearchAgent.Scraper.ParlinfoClientBehaviour
+Mox.defmock(ParliamentSearchAgent.Scraper.MockParlinfoClient,
+  for: ParliamentSearchAgent.Scraper.ParlinfoClientBehaviour
 )
 
-Mox.defmock(ParlInfoSearchAgent.Scraper.MockParlViewClient,
-  for: ParlInfoSearchAgent.Scraper.ParlViewClientBehaviour
+Mox.defmock(ParliamentSearchAgent.Scraper.MockParlViewClient,
+  for: ParliamentSearchAgent.Scraper.ParlViewClientBehaviour
 )

@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.RemoveParlviewUrlAndPermalinkFromBroadcasts do
+defmodule ParliamentSearchAgent.Repo.Migrations.RemoveParlviewUrlAndPermalinkFromBroadcasts do
   use Ecto.Migration
 
   def change do

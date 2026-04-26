@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.RenameCommitteeHearingsToHearingTranscripts do
+defmodule ParliamentSearchAgent.Repo.Migrations.RenameCommitteeHearingsToHearingTranscripts do
   use Ecto.Migration
 
   def change do

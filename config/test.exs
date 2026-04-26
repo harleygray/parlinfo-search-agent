@@ -5,14 +5,14 @@ import Config
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
-config :parlinfo_search_agent, ParlInfoSearchAgent.Repo,
-  database: "parlinfo_search_agent_test#{System.get_env("MIX_TEST_PARTITION")}",
+config :parliament_search_agent, ParliamentSearchAgent.Repo,
+  database: "parliament_search_agent_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :parlinfo_search_agent, ParlInfoSearchAgentWeb.Endpoint,
+config :parliament_search_agent, ParliamentSearchAgentWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4004],
   secret_key_base:
     System.get_env(
@@ -35,9 +35,9 @@ config :phoenix_live_view,
 config :phoenix,
   sort_verified_routes_query_params: true
 
-config :parlinfo_search_agent, Oban, testing: :inline
+config :parliament_search_agent, Oban, testing: :inline
 
-config :parlinfo_search_agent, :playwright_server_enabled, false
+config :parliament_search_agent, :playwright_server_enabled, false
 
-config :parlinfo_search_agent, :parlinfo_client, ParlInfoSearchAgent.Scraper.MockParlinfoClient
-config :parlinfo_search_agent, :parlview_client, ParlInfoSearchAgent.Scraper.MockParlViewClient
+config :parliament_search_agent, :parlinfo_client, ParliamentSearchAgent.Scraper.MockParlinfoClient
+config :parliament_search_agent, :parlview_client, ParliamentSearchAgent.Scraper.MockParlViewClient

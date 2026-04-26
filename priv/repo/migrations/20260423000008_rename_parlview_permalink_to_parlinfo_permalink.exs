@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.RenameParlviewPermalinkToParlinfoPermanlink do
+defmodule ParliamentSearchAgent.Repo.Migrations.RenameParlviewPermalinkToParlinfoPermanlink do
   use Ecto.Migration
 
   def change do

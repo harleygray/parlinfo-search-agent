@@ -1,8 +1,8 @@
 # ParlInfo Backfill Analysis
 
 ```elixir
-alias ParlInfoSearchAgent.Repo
-alias ParlInfoSearchAgent.Items.{Report, Broadcast, HearingTranscript}
+alias ParliamentSearchAgent.Repo
+alias ParliamentSearchAgent.Items.{Report, Broadcast, HearingTranscript}
 import Ecto.Query
 ```
 

@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.AddParlviewIdToBroadcasts do
+defmodule ParliamentSearchAgent.Repo.Migrations.AddParlviewIdToBroadcasts do
   use Ecto.Migration
 
   def change do

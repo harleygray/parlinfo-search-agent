@@ -1,9 +1,9 @@
-defmodule ParlInfoSearchAgent.MixProject do
+defmodule ParliamentSearchAgent.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :parlinfo_search_agent,
+      app: :parliament_search_agent,
       version: "0.1.1",
       elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -20,7 +20,7 @@ defmodule ParlInfoSearchAgent.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {ParlInfoSearchAgent.Application, []},
+      mod: {ParliamentSearchAgent.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end

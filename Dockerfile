@@ -64,7 +64,7 @@ ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
 WORKDIR /app
 RUN chown nobody /app
 
-COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/parlinfo_search_agent ./
+COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/parliament_search_agent ./
 COPY --from=builder --chown=nobody:root /app/playwright_server ./playwright_server
 
 USER nobody

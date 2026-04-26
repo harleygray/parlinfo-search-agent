@@ -1,7 +1,7 @@
 import Config
 
 # Configure your database
-config :parlinfo_search_agent, ParlInfoSearchAgent.Repo,
+config :parliament_search_agent, ParliamentSearchAgent.Repo,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -12,7 +12,7 @@ config :parlinfo_search_agent, ParlInfoSearchAgent.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :parlinfo_search_agent, ParlInfoSearchAgentWeb.Endpoint,
+config :parliament_search_agent, ParliamentSearchAgentWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4002],
@@ -50,7 +50,7 @@ config :parlinfo_search_agent, ParlInfoSearchAgentWeb.Endpoint,
 # different ports.
 
 # Reload browser tabs when matching files change.
-config :parlinfo_search_agent, ParlInfoSearchAgentWeb.Endpoint,
+config :parliament_search_agent, ParliamentSearchAgentWeb.Endpoint,
   live_reload: [
     web_console_logger: true,
     patterns: [
@@ -59,13 +59,13 @@ config :parlinfo_search_agent, ParlInfoSearchAgentWeb.Endpoint,
       # Gettext translations
       ~r"priv/gettext/.*\.po$",
       # Router, Controllers, LiveViews and LiveComponents
-      ~r"lib/parlinfo_search_agent_web/router\.ex$",
-      ~r"lib/parlinfo_search_agent_web/(controllers|live|components)/.*\.(ex|heex)$"
+      ~r"lib/parliament_search_agent_web/router\.ex$",
+      ~r"lib/parliament_search_agent_web/(controllers|live|components)/.*\.(ex|heex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :parlinfo_search_agent, dev_routes: true
+config :parliament_search_agent, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"

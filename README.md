@@ -185,8 +185,8 @@ Served at `/`, the dashboard has two tabs visible in the navbar:
 **1. Clone and install dependencies**
 
 ```bash
-git clone https://github.com/harleygray/parlinfo-search-agent
-cd parlinfo-search-agent
+git clone https://github.com/harleygray/parliament-search-agent
+cd parliament-search-agent
 mix deps.get
 ```
 

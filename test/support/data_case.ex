@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.DataCase do
+defmodule ParliamentSearchAgent.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -10,7 +10,7 @@ defmodule ParlInfoSearchAgent.DataCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use ParlInfoSearchAgent.DataCase, async: true`, although
+  by setting `use ParliamentSearchAgent.DataCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -18,17 +18,17 @@ defmodule ParlInfoSearchAgent.DataCase do
 
   using do
     quote do
-      alias ParlInfoSearchAgent.Repo
+      alias ParliamentSearchAgent.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import ParlInfoSearchAgent.DataCase
+      import ParliamentSearchAgent.DataCase
     end
   end
 
   setup tags do
-    ParlInfoSearchAgent.DataCase.setup_sandbox(tags)
+    ParliamentSearchAgent.DataCase.setup_sandbox(tags)
     :ok
   end
 
@@ -37,7 +37,7 @@ defmodule ParlInfoSearchAgent.DataCase do
   """
   def setup_sandbox(tags) do
     pid =
-      Ecto.Adapters.SQL.Sandbox.start_owner!(ParlInfoSearchAgent.Repo, shared: not tags[:async])
+      Ecto.Adapters.SQL.Sandbox.start_owner!(ParliamentSearchAgent.Repo, shared: not tags[:async])
 
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
   end

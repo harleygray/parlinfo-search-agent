@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.RemoveParlInfoIdFromBroadcasts do
+defmodule ParliamentSearchAgent.Repo.Migrations.RemoveParlInfoIdFromBroadcasts do
   use Ecto.Migration
 
   def change do

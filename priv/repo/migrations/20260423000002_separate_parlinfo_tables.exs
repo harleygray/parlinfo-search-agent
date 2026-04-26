@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.SeparateParlinfoTables do
+defmodule ParliamentSearchAgent.Repo.Migrations.SeparateParlinfoTables do
   use Ecto.Migration
 
   def change do

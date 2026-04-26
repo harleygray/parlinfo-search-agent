@@ -1,4 +1,4 @@
-app = "parlinfo-search-agent"
+app = "parliament-search-agent"
 primary_region = "syd"
 kill_signal = "SIGTERM"
 
@@ -8,7 +8,7 @@ kill_signal = "SIGTERM"
   release_command = "/app/bin/migrate"
 
 [env]
-  PHX_HOST = "parlinfo-search-agent.fly.dev"
+  PHX_HOST = "parliament-search-agent.fly.dev"
   PORT = "8080"
 
 [http_service]

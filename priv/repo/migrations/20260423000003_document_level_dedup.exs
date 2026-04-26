@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.DocumentLevelDedup do
+defmodule ParliamentSearchAgent.Repo.Migrations.DocumentLevelDedup do
   use Ecto.Migration
 
   def change do

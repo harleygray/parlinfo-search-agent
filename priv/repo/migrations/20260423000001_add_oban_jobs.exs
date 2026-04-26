@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.AddObanJobs do
+defmodule ParliamentSearchAgent.Repo.Migrations.AddObanJobs do
   use Ecto.Migration
 
   def up, do: Oban.Migration.up(version: 12)

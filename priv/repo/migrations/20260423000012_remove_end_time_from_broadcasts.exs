@@ -1,4 +1,4 @@
-defmodule ParlInfoSearchAgent.Repo.Migrations.RemoveEndTimeFromBroadcasts do
+defmodule ParliamentSearchAgent.Repo.Migrations.RemoveEndTimeFromBroadcasts do
   use Ecto.Migration
 
   def change do

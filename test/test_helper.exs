@@ -1,2 +1,2 @@
 ExUnit.start()
-Ecto.Adapters.SQL.Sandbox.mode(ParlInfoSearchAgent.Repo, :manual)
+Ecto.Adapters.SQL.Sandbox.mode(ParliamentSearchAgent.Repo, :manual)
