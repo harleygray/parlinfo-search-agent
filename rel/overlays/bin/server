@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
 
-PHX_SERVER=true exec "$(dirname "$0")/parlinfo_search_agent" start
+PHX_SERVER=true exec "$(dirname "$0")/parliament_search_agent" start

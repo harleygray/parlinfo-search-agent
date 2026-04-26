@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
 
-exec "$(dirname "$0")/parlinfo_search_agent" eval "ParlInfoSearchAgent.Release.migrate()"
+exec "$(dirname "$0")/parliament_search_agent" eval "ParliamentSearchAgent.Release.migrate()"
