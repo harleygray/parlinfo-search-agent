@@ -13,8 +13,6 @@ This project bridges that gap:
 3. A clean JSON REST API serves the stored data to downstream consumers
 4. A Phoenix LiveView dashboard lets you watch new items arrive in real time
 
-An immediate downstream consumer is [Civic Forum](https://civicforum.com.au), which uses this cleaned parliamentary data for AI workflows. The API is designed to be generic enough for any consumer of this information.
-
 ---
 
 ## Datasets Covered
@@ -26,7 +24,7 @@ An immediate downstream consumer is [Civic Forum](https://civicforum.com.au), wh
 | **Hearing Transcripts** | ParlInfo scraper  | Estimates hearings and committee proceedings — title, committee, date, parliament number, and PDF link                                                 |
 | **Broadcasts**          | ParlView REST API | Live and archived parliamentary TV recordings — title, chamber, start time, duration, and direct ParlView link                                         |
 
-Reports and hearing transcripts are scraped every 15 minutes. Broadcasts are pulled from the ParlView API, which returns the 100 most recent committee recordings and updates live/ended status on subsequent runs.
+Each dataset refreshes every 30 minutes. The three scrapers are staggered 5 minutes apart so they never hit the Playwright sidecar simultaneously: Reports at :00 and :30, Hearing Transcripts at :05 and :35, Broadcasts at :10 and :40. Broadcasts are pulled from the ParlView API, which returns the 100 most recent committee recordings and updates live/ended status on subsequent runs.
 
 ---
 
@@ -36,7 +34,7 @@ Reports and hearing transcripts are scraped every 15 minutes. Broadcasts are pul
 ┌─────────────────────────────────────────────────────────┐
 │                  Phoenix / OTP Application               │
 │                                                         │
-│   Oban Cron (15min)                                     │
+│   Oban Cron (30min)                                     │
 │   ┌──────────────┐  ┌──────────────┐  ┌─────────────┐  │
 │   │ReportsScraper│  │HearingScraper│  │BroadcastsSc.│  │
 │   └──────┬───────┘  └──────┬───────┘  └──────┬──────┘  │
@@ -220,7 +218,7 @@ cd ..
 mix phx.server
 ```
 
-The Phoenix app starts on `http://localhost:4002`. The Playwright server starts automatically as a supervised GenServer on port 4003. Oban workers begin running on their 15-minute cron schedule; the first scrape runs on startup.
+The Phoenix app starts on `http://localhost:4002`. The Playwright server starts automatically as a supervised GenServer on port 4003. Oban workers begin running on their staggered 30-minute cron schedule; the first scrape runs on startup.
 
 ### Useful commands
 
