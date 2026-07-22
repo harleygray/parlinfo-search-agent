@@ -12,6 +12,19 @@ defmodule ParliamentSearchAgentWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :gone
+  end
+
+  # Sunset (2026-07-22): this public API is retired. The data now lives in Civic
+  # Forum's authenticated API — every /api request answers 410 with a pointer.
+  def gone(conn, _opts) do
+    conn
+    |> Plug.Conn.put_resp_content_type("application/json")
+    |> Plug.Conn.send_resp(
+      410,
+      ~s({"error":"gone","see":"https://civicforum.com.au/developers"})
+    )
+    |> Plug.Conn.halt()
   end
 
   scope "/", ParliamentSearchAgentWeb do
@@ -42,5 +55,9 @@ defmodule ParliamentSearchAgentWeb.Router do
     get "/broadcasts/latest", Api.BroadcastsController, :latest
     get "/broadcasts/:id", Api.BroadcastsController, :show
     get "/broadcasts", Api.BroadcastsController, :index
+
+    # Never dispatches — the :gone pipeline plug halts first. Present so every
+    # /api path (not just the nine routes above) answers 410 rather than 404.
+    match :*, "/*path", Api.ReportsController, :index
   end
 end

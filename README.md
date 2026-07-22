@@ -1,5 +1,7 @@
 # Parliament Search Agent
 
+> **⚠️ Retired (July 2026).** This project has been absorbed into [Civic Forum](https://civicforum.com.au) and its public API is no longer served — every `/api` request returns HTTP 410. The same datasets (and more, including the scalar `parlinfo_id` and permalink this API never exposed) are available via Civic Forum's authenticated API at `https://civicforum.com.au/api/v1/parlinfo/*` and `/api/v1/parlview/*`. Getting a key is self-serve — see [civicforum.com.au/developers](https://civicforum.com.au/developers) for the route mapping and signup steps.
+
 An interface for accessing the Australian Parliament's public archives. It continuously scrapes [ParlInfo](https://parlinfo.aph.gov.au/) and the ParlView broadcast API, deduplicates and stores results in PostgreSQL, and exposes them via a typed JSON REST API — with a real-time LiveView dashboard for monitoring.
 
 ## What Problem Does This Solve?
