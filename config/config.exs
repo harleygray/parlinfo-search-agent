@@ -31,17 +31,17 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Sunset (2026-07-24): the app is retired and serves only 410s and the
+# dashboard — no scraping. The Playwright sidecar stays off (a fresh image
+# rebuild broke its Chromium pairing and it took the whole app down with it),
+# and the scraper crons are gone with it.
+config :parliament_search_agent, :playwright_server_enabled, false
+
 config :parliament_search_agent, Oban,
   repo: ParliamentSearchAgent.Repo,
   plugins: [
     {Oban.Plugins.Pruner, max_age: 60 * 60 * 24},
-    {Oban.Plugins.Cron,
-     crontab: [
-       {"0,30 * * * *", ParliamentSearchAgent.Workers.ReportsScraper},
-       {"5,35 * * * *", ParliamentSearchAgent.Workers.HearingTranscriptsScraper},
-       {"10,40 * * * *", ParliamentSearchAgent.Workers.BroadcastsScraper},
-       {"15,45 * * * *", ParliamentSearchAgent.Workers.DetailBackfillWorker}
-     ]}
+    {Oban.Plugins.Cron, crontab: []}
   ],
   queues: [scraper: 1]
 
